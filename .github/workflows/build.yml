@@ -26,13 +26,23 @@ jobs:
           platforms: linux/arm64
           outputs: type=docker,dest=docker-images/aarch64.tar
       
-      - name: Prepare StartOS SDK
-        uses: start9labs/sdk@v2
-      
+      - name: Install Rust 1.75 and build start-sdk
+        run: |
+          curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.75.0
+          source $HOME/.cargo/env
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev pkg-config
+          
+          # Clone older version of start-os that works with manifest.yaml
+          git clone -b v0.3.5.1 https://github.com/Start9Labs/start-os.git
+          cd start-os/core
+          cargo install --locked --path startos --features sdk
+          
       - name: Initialize and Pack
         run: |
-          start-cli init-key
-          start-cli s9pk pack
+          source $HOME/.cargo/env
+          start-sdk init
+          start-sdk pack
       
       - name: Upload s9pk artifact
         uses: actions/upload-artifact@v4
