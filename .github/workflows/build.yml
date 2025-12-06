@@ -26,19 +26,27 @@ jobs:
           platforms: linux/arm64
           outputs: type=docker,dest=docker-images/aarch64.tar
       
-      - name: Install Rust 1.75 and build start-sdk
+      - name: Install Rust 1.70 and build start-sdk
         run: |
-          curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.75.0
+          curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.70.0
           source $HOME/.cargo/env
           sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev pkg-config
+          sudo apt-get install -y build-essential libssl-dev pkg-config libclang-dev clang
           
-          # Clone with submodules
-          git clone --recursive -b v0.3.5.1 https://github.com/Start9Labs/start-os.git
-          cd start-os/core
-          cargo install --locked --path startos --features sdk
+          # Clone with submodules - use v0.3.4 which is more stable
+          git clone --recursive -b v0.3.4.4 https://github.com/Start9Labs/start-os.git
+          cd start-os/backend
+          cargo install --locked --path . --features sdk
           
       - name: Initialize and Pack
         run: |
           source $HOME/.cargo/env
-          start
+          start-sdk init
+          start-sdk pack
+      
+      - name: Upload s9pk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: feedview-relay-s9pk
+          path: "*.s9pk"
+          retention-days: 30
