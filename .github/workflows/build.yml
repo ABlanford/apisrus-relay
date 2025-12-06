@@ -33,20 +33,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libssl-dev pkg-config
           
-          # Clone older version of start-os that works with manifest.yaml
-          git clone -b v0.3.5.1 https://github.com/Start9Labs/start-os.git
+          # Clone with submodules
+          git clone --recursive -b v0.3.5.1 https://github.com/Start9Labs/start-os.git
           cd start-os/core
           cargo install --locked --path startos --features sdk
           
       - name: Initialize and Pack
         run: |
           source $HOME/.cargo/env
-          start-sdk init
-          start-sdk pack
-      
-      - name: Upload s9pk artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: feedview-relay-s9pk
-          path: "*.s9pk"
-          retention-days: 30
+          start
