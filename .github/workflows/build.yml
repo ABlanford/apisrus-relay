@@ -1,0 +1,59 @@
+name: Build FeedView Relay s9pk
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker Image for ARM64
+        working-directory: ./feedview-relay-COMPLETE
+        run: |
+          docker buildx build \
+            --platform=linux/arm64 \
+            --tag start9/feedview-relay/main:0.1.0 \
+            -o type=docker,dest=image.tar \
+            .
+      
+      - name: Install Rust
+        run: |
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      
+      - name: Install Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      
+      - name: Clone and Install start-sdk
+        run: |
+          git clone --depth 1 https://github.com/Start9Labs/start-os.git
+          cd start-os/backend
+          ~/.cargo/bin/cargo install --path ./
+      
+      - name: Initialize and Pack
+        working-directory: ./feedview-relay-COMPLETE
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          start-sdk init
+          start-sdk pack
+      
+      - name: Upload s9pk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: feedview-relay-s9pk
+          path: "./feedview-relay-COMPLETE/*.s9pk"
+          retention-days: 30
