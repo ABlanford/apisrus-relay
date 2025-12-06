@@ -32,16 +32,27 @@ jobs:
           curl https://sh.rustup.rs -sSf | sh -s -- -y
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
       
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
+      
       - name: Install Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
       
-      - name: Clone and Install start-sdk
+      - name: Clone start-os and install SDK
         run: |
-          git clone --depth 1 https://github.com/Start9Labs/start-os.git
-          cd start-os/backend
-          ~/.cargo/bin/cargo install --path ./
+          git clone -b latest --recursive https://github.com/Start9Labs/start-os.git
+          cd start-os
+          if [ -d "backend" ]; then
+            cd backend && ./install-sdk.sh
+          elif [ -d "core" ]; then
+            cd core && ./install-sdk.sh
+          else
+            ~/.cargo/bin/cargo install --path ./sdk
+          fi
       
       - name: Initialize and Pack
         run: |
@@ -54,37 +65,4 @@ jobs:
         with:
           name: feedview-relay-s9pk
           path: "*.s9pk"
-          retention-days: 30
-            --tag start9/feedview-relay/main:0.1.0 \
-            -o type=docker,dest=image.tar \
-            .
-      
-      - name: Install Rust
-        run: |
-          curl https://sh.rustup.rs -sSf | sh -s -- -y
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      
-      - name: Install Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: v1.x
-      
-      - name: Clone and Install start-sdk
-        run: |
-          git clone --depth 1 https://github.com/Start9Labs/start-os.git
-          cd start-os/backend
-          ~/.cargo/bin/cargo install --path ./
-      
-      - name: Initialize and Pack
-        working-directory: ./feedview-relay-COMPLETE
-        run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
-          start-sdk init
-          start-sdk pack
-      
-      - name: Upload s9pk artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: feedview-relay-s9pk
-          path: "./feedview-relay-COMPLETE/*.s9pk"
           retention-days: 30
