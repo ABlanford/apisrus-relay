@@ -1,0 +1,65 @@
+name: Build FeedView Relay s9pk
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker Image for ARM64
+        run: |
+          docker buildx build \
+            --platform=linux/arm64 \
+            --tag start9/feedview-relay/main:0.1.0 \
+            -o type=docker,dest=image.tar \
+            .
+      
+      - name: Install Rust 1.79
+        run: |
+          curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.79.0
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential openssl libssl-dev libc6-dev clang libclang-dev ca-certificates
+      
+      - name: Install Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      
+      - name: Clone start-os v0.3.5 and update time crate
+        run: |
+          git clone -b v0.3.5.1 --recursive https://github.com/Start9Labs/start-os.git
+          cd start-os/core
+          # Update time crate to fix the bug
+          sed -i 's/time = "0.3"/time = ">=0.3.35"/' Cargo.toml 2>/dev/null || true
+          cargo update -p time 2>/dev/null || true
+          ./install-sdk.sh
+      
+      - name: Initialize and Pack
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          start-sdk init
+          start-sdk pack
+      
+      - name: Upload s9pk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: feedview-relay-s9pk
+          path: "*.s9pk"
+          retention-days: 30
