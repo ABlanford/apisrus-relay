@@ -1,18 +1,6 @@
 FROM bluenviron/mediamtx:latest-ffmpeg
 
-LABEL maintainer="APIs R Us"
-LABEL description="FeedView Relay - Convert RTSP cameras to Lightning-payable HLS streams"
+RUN apk update && apk add --no-cache tini && rm -f /var/cache/apk/*
 
-ENV PUID=1000
-ENV PGID=1000
-
-COPY docker_entrypoint.sh /docker_entrypoint.sh
-RUN chmod +x /docker_entrypoint.sh
-
-EXPOSE 8554
-EXPOSE 8888
-EXPOSE 8889
-
-VOLUME /data
-
-ENTRYPOINT ["/docker_entrypoint.sh"]
+COPY docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
+RUN chmod a+x /usr/local/bin/docker_entrypoint.sh
