@@ -1,50 +1,20 @@
-// FeedView Relay - Get Configuration Script
-// Returns current configuration for StartOS UI
-
-import { types as T, compat } from "../deps.ts";
+import { compat, types as T } from "../deps.ts";
 
 export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
-  "cameras": {
-    "type": "list",
-    "name": "Camera Streams",
-    "description": "Configure your RTSP camera streams to convert to HLS",
-    "range": "[0,10]",
-    "default": [],
-    "subtype": "object",
-    "spec": {
-      "id": {
-        "type": "string",
-        "name": "Camera ID",
-        "description": "Unique identifier for this camera (lowercase, no spaces)",
-        "nullable": false,
-        "pattern": "^[a-z0-9-]+$",
-        "pattern-description": "Must be lowercase letters, numbers, and hyphens only"
-      },
-      "name": {
-        "type": "string",
-        "name": "Display Name",
-        "description": "Human-readable name for this camera",
-        "nullable": false
-      },
-      "rtsp_url": {
-        "type": "string",
-        "name": "RTSP URL",
-        "description": "Full RTSP URL including credentials (e.g., rtsp://admin:password@192.168.1.100:554/...)",
-        "nullable": false,
-        "masked": true
-      },
-      "enabled": {
-        "type": "boolean",
-        "name": "Enabled",
-        "description": "Enable or disable this camera stream",
-        "default": true
-      }
-    }
+  "rtsp-url": {
+    type: "string",
+    name: "RTSP Camera URL",
+    description: "The RTSP URL of your camera (e.g., rtsp://admin:password@192.168.1.100:554/cam/realmonitor?channel=1&subtype=0)",
+    nullable: false,
+    default: "rtsp://admin:password@192.168.1.100:554/cam/realmonitor?channel=1&subtype=0",
   },
-  "demo_stream": {
-    "type": "boolean",
-    "name": "Enable Demo Stream",
-    "description": "Include a demo stream (Big Buck Bunny) for testing",
-    "default": true
-  }
+  "stream-name": {
+    type: "string",
+    name: "Stream Name",
+    description: "Name for this camera stream (used in the HLS URL path)",
+    nullable: false,
+    default: "cam1",
+    pattern: "^[a-zA-Z0-9_-]+$",
+    "pattern-description": "Must contain only letters, numbers, underscores, and hyphens",
+  },
 });
