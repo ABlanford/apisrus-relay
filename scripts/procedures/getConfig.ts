@@ -1,21 +1,51 @@
 import { compat, types as T } from "../deps.ts";
 
-export const getConfig: T.ExpectedExports.getConfig = compat.getConfig({
-  "camera-url": {
-    "type": "string",
-    "name": "Camera RTSP URL",
-    "description": "The RTSP URL of your Lorex DVR camera. Example: rtsp://admin:password@192.168.1.100:554/cam/realmonitor?channel=1&subtype=1",
-    "nullable": true,
-    "masked": true,
-    "copyable": true,
-  },
-  "stream-name": {
-    "type": "string",
-    "name": "Stream Name",
-    "description": "A short name for your stream (no spaces). This will be the URL path.",
-    "nullable": false,
-    "default": "camera1",
-    "pattern": "^[a-zA-Z0-9_-]+$",
-    "pattern-description": "Only letters, numbers, underscores, and hyphens allowed",
-  },
+export const setConfig: T.ExpectedExports.setConfig = compat.setConfig(async (effects, config) => {
+  const cameraUrl = config["camera-url"] as string | null;
+  const streamName = config["stream-name"] as string;
+
+  let pathsConfig = `
+paths:
+  all:
+`;
+
+  if (cameraUrl) {
+    pathsConfig += `
+  ${streamName}:
+    source: "${cameraUrl}"
+    sourceOnDemand: yes
+`;
+  }
+
+  const mediamtxConfig = `
+logLevel: info
+logDestinations: [stdout]
+
+api: yes
+apiAddress: :9997
+
+rtsp: yes
+rtspAddress: :8554
+
+hls: yes
+hlsAddress: :8888
+hlsAlwaysRemux: yes
+hlsAllowOrigins: ["*"]
+
+${pathsConfig}
+`;
+
+  await effects.writeFile({
+    path: "/data/mediamtx.yml",
+    toWrite: mediamtxConfig,
+    volumeId: "main",
+  });
+
+  await effects.writeFile({
+    path: "/data/config.json",
+    toWrite: JSON.stringify({ cameraUrl: cameraUrl ? "configured" : null, streamName }),
+    volumeId: "main",
+  });
+
+  return { signal: "SIGTERM" as const, "depends-on": {} };
 });
