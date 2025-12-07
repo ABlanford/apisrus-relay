@@ -61,14 +61,8 @@ health-checks:
     io-format: yaml
     timeout: 30s
 
-config:
-  get:
-    type: script
-  set:
-    type: script
-
-properties:
-  type: script
+config: ~
+properties: ~
 
 volumes:
   main:
