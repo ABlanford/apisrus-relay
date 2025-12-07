@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies and build TypeScript
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Pack s9pk
