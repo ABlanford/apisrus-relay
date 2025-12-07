@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,8 +27,11 @@ jobs:
           platforms: linux/arm64
           outputs: type=docker,dest=docker-images/aarch64.tar
 
-      - name: Install deps
-        run: sudo apt-get update && sudo apt-get install -y build-essential libssl-dev pkg-config libclang-dev clang libavahi-client-dev
+      - name: Install deps with OpenSSL 1.1
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libclang-dev clang libavahi-client-dev
+          sudo apt-get install -y libssl1.1 libssl-dev
 
       - name: Install Rust
         run: curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.70.0 && echo "$HOME/.cargo/bin" >> $GITHUB_PATH
