@@ -30,7 +30,7 @@ jobs:
       - name: Pack
         run: |
           start-cli init-key
-          start-cli pack
+          start-cli s9pk pack
 
       - name: Upload
         uses: actions/upload-artifact@v4
