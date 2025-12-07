@@ -1,17 +1,11 @@
 {
+  "include": ["startos/**/*.ts", "node_modules/**/startos"],
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2018",
     "module": "CommonJS",
-    "lib": ["ES2022"],
-    "outDir": "./javascript",
-    "rootDir": "./startos",
-    "strict": true,
+    "moduleResolution": "node",
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true
-  },
-  "include": ["startos/**/*"],
-  "exclude": ["node_modules"]
+    "strict": true,
+    "skipLibCheck": true
+  }
 }
