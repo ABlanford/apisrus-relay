@@ -1,16 +1,8 @@
-import { ExpectedExports, BackupExports, InstallExports } from '@start9labs/start-sdk'
-
-export const install: InstallExports = async () => {
-  return { configured: true }
-}
-
-export const backup: BackupExports = async () => {
-  return []
-}
-
-export const expected: ExpectedExports = {
-  main: {
-    health: async () => ({ result: { type: 'ready' } }),
-    'init-config': async () => ({ configured: true }),
-  },
-}
+export { createBackup } from './backups'
+export { main } from './main'
+export { init, uninit } from './init'
+export { actions } from './actions'
+import { buildManifest } from '@start9labs/start-sdk'
+import { manifest as sdkManifest } from './manifest'
+import { versionGraph } from './install/versionGraph'
+export const manifest = buildManifest(versionGraph, sdkManifest)
