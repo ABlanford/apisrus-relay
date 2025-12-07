@@ -1,22 +1,22 @@
-#!/bin/bash
+#!/bin/sh
 set -e
-
-echo "Starting FeedView Relay..."
 
 MEDIAMTX_CONFIG="/data/mediamtx.yml"
 
-# Check for manual config file
-MANUAL_CONFIG="/data/camera.conf"
-
+# Parse camera URL and stream name
 CAMERA_URL=""
 STREAM_NAME="camera1"
 
-if [ -f "$MANUAL_CONFIG" ]; then
-  echo "Reading manual config from $MANUAL_CONFIG"
-  source "$MANUAL_CONFIG"
+# Try StartOS config first
+if [ -f "/root/start9/config.yaml" ]; then
+  CAMERA_URL=$(grep "camera-url:" "/root/start9/config.yaml" 2>/dev/null | sed 's/.*camera-url: *//' | tr -d '"' | tr -d "'" || echo "")
+  STREAM_NAME=$(grep "stream-name:" "/root/start9/config.yaml" 2>/dev/null | sed 's/.*stream-name: *//' | tr -d '"' | tr -d "'" || echo "camera1")
 fi
 
-echo "Stream name: $STREAM_NAME"
+# Fallback to manual config file
+if [ -z "$CAMERA_URL" ] && [ -f "/data/camera.conf" ]; then
+  . /data/camera.conf
+fi
 
 # Generate MediaMTX config
 cat > "$MEDIAMTX_CONFIG" << EOF
@@ -38,7 +38,7 @@ paths:
   all:
 EOF
 
-if [ -n "$CAMERA_URL" ]; then
+if [ -n "$CAMERA_URL" ] && [ "$CAMERA_URL" != "null" ]; then
   cat >> "$MEDIAMTX_CONFIG" << EOF
   ${STREAM_NAME}:
     source: "${CAMERA_URL}"
@@ -46,9 +46,8 @@ if [ -n "$CAMERA_URL" ]; then
 EOF
   echo "Configured stream: $STREAM_NAME -> $CAMERA_URL"
 else
-  echo "No camera configured. SSH in and create /data/camera.conf with:"
-  echo "  CAMERA_URL=\"rtsp://admin:password@192.168.1.X:554/cam/realmonitor?channel=1&subtype=1\""
-  echo "  STREAM_NAME=\"camera1\""
+  echo "No camera URL configured - running in demo mode"
 fi
 
+echo "Starting MediaMTX..."
 exec /mediamtx "$MEDIAMTX_CONFIG"
