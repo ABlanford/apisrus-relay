@@ -1,9 +1,9 @@
 id: feedview-relay
 title: "FeedView Relay"
-version: 0.3.5.4
+version: 0.3.5.5
 release-notes: |
-  - Fixed container startup with tini
-  - Simplified MediaMTX configuration
+  - Added config UI for camera RTSP URL
+  - Properties show stream URL
 license: MIT
 wrapper-repo: "https://github.com/ABlanford/apisrus-relay"
 upstream-repo: "https://github.com/bluenviron/mediamtx"
@@ -36,8 +36,13 @@ health-checks:
     name: MediaMTX API
     success-message: MediaMTX is running and accessible
     type: script
-config: ~
-properties: ~
+config:
+  get:
+    type: script
+  set:
+    type: script
+properties:
+  type: script
 volumes:
   main:
     type: data
