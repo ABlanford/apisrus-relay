@@ -1,6 +1,6 @@
 id: feedview-relay
 title: "FeedView Relay"
-version: 0.3.5.1
+version: 0.3.5.2
 release-notes: |
   - Added x86_64 architecture support
   - RTSP to HLS transcoding via MediaMTX
@@ -66,20 +66,30 @@ dependencies: {}
 backup:
   create:
     type: docker
-    image: main
+    image: compat
     system: true
-    entrypoint: "true"
-    args: []
+    entrypoint: compat
+    args:
+      - duplicity
+      - create
+      - /mnt/backup
+      - /data
     mounts:
-      main: /data
+      BACKUP: "/mnt/backup"
+      main: "/data"
   restore:
     type: docker
-    image: main
+    image: compat
     system: true
-    entrypoint: "true"
-    args: []
+    entrypoint: compat
+    args:
+      - duplicity
+      - restore
+      - /mnt/backup
+      - /data
     mounts:
-      main: /data
+      BACKUP: "/mnt/backup"
+      main: "/data"
 migrations:
   from:
     "*":
