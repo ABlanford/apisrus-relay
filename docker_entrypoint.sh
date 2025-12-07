@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 # Read config from StartOS (YAML format at /root/start9/config.yaml)
