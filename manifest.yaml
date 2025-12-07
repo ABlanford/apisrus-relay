@@ -1,10 +1,9 @@
 id: feedview-relay
 title: "FeedView Relay"
-version: 0.3.5.3
+version: 0.3.5.4
 release-notes: |
-  - Added x86_64 architecture support
-  - RTSP to HLS transcoding via MediaMTX
-  - Configure your Lorex DVR camera feeds
+  - Fixed container startup with tini
+  - Simplified MediaMTX configuration
 license: MIT
 wrapper-repo: "https://github.com/ABlanford/apisrus-relay"
 upstream-repo: "https://github.com/bluenviron/mediamtx"
@@ -23,7 +22,7 @@ assets:
 main:
   type: docker
   image: main
-  entrypoint: "docker_entrypoint.sh"
+  entrypoint: "/usr/local/bin/docker_entrypoint.sh"
   args: []
   mounts:
     main: /data
@@ -37,13 +36,8 @@ health-checks:
     name: MediaMTX API
     success-message: MediaMTX is running and accessible
     type: script
-config:
-  get:
-    type: script
-  set:
-    type: script
-properties:
-  type: script
+config: ~
+properties: ~
 volumes:
   main:
     type: data
