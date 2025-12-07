@@ -1,14 +1,15 @@
 {
-  "name": "feedview-relay",
-  "version": "0.1.0",
+  "name": "feedview-relay-startos",
   "scripts": {
-    "build": "tsc"
-  },
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "@aspect-build/rules_ts": "^2.0.0"
+    "build": "rm -rf ./javascript && ncc build startos/index.ts -o ./javascript",
+    "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@start9labs/start-sdk": "^0.4.0-rev0.lib0.rc8.2"
+    "@start9labs/start-sdk": "^0.4.0-beta.44"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "@vercel/ncc": "^0.38.4",
+    "typescript": "^5.9.3"
   }
 }
