@@ -1,0 +1,14 @@
+{
+  "name": "feedview-relay",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@aspect-build/rules_ts": "^2.0.0"
+  },
+  "dependencies": {
+    "@start9labs/start-sdk": "^0.4.0-rev0.lib0.rc8.2"
+  }
+}
