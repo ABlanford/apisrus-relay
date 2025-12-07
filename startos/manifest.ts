@@ -10,6 +10,7 @@ export const manifest = setupManifest({
   supportSite: 'https://github.com/ABlanford/apisrus-relay/issues',
   marketingSite: 'https://github.com/ABlanford/apisrus-relay',
   donationUrl: null,
+  docsUrl: 'https://github.com/ABlanford/apisrus-relay/blob/main/instructions.md',
   description: {
     short: 'RTSP to HLS video relay for camera feeds',
     long: 'FeedView Relay transcodes RTSP camera streams to HLS format for web-based viewing with Lightning micropayments.',
