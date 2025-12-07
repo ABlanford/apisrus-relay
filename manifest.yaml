@@ -1,11 +1,10 @@
 id: feedview-relay
 title: "FeedView Relay"
-version: 0.3.5.0
+version: 0.3.5.1
 release-notes: |
-  Initial release for StartOS 0.3.5.x
+  - Added x86_64 architecture support
   - RTSP to HLS transcoding via MediaMTX
   - Configure your Lorex DVR camera feeds
-  - Web-accessible HLS streams for FeedView app
 license: MIT
 wrapper-repo: "https://github.com/ABlanford/apisrus-relay"
 upstream-repo: "https://github.com/bluenviron/mediamtx"
@@ -32,6 +31,7 @@ main:
 hardware-requirements:
   arch:
     - aarch64
+    - x86_64
 health-checks:
   api:
     name: MediaMTX API
@@ -49,30 +49,16 @@ volumes:
     type: data
 interfaces:
   main:
-    name: HLS Stream Interface
-    description: Access HLS video streams from your cameras
+    name: MediaMTX Web Interface
+    description: Access HLS streams
     tor-config:
       port-mapping:
-        8888: "8888"
+        80: "8888"
     lan-config:
-      8888:
-        ssl: false
+      443:
+        ssl: true
         internal: 8888
-    ui: false
-    protocols:
-      - tcp
-      - http
-  api:
-    name: MediaMTX API
-    description: MediaMTX management API
-    tor-config:
-      port-mapping:
-        9997: "9997"
-    lan-config:
-      9997:
-        ssl: false
-        internal: 9997
-    ui: false
+    ui: true
     protocols:
       - tcp
       - http
@@ -80,30 +66,20 @@ dependencies: {}
 backup:
   create:
     type: docker
-    image: compat
+    image: main
     system: true
-    entrypoint: compat
-    args:
-      - duplicity
-      - create
-      - /mnt/backup
-      - /data
+    entrypoint: "true"
+    args: []
     mounts:
-      BACKUP: "/mnt/backup"
-      main: "/data"
+      main: /data
   restore:
     type: docker
-    image: compat
+    image: main
     system: true
-    entrypoint: compat
-    args:
-      - duplicity
-      - restore
-      - /mnt/backup
-      - /data
+    entrypoint: "true"
+    args: []
     mounts:
-      BACKUP: "/mnt/backup"
-      main: "/data"
+      main: /data
 migrations:
   from:
     "*":
