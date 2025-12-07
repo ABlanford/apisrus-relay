@@ -1,18 +1,21 @@
 #!/bin/sh
 set -e
 
-# Read config from StartOS (YAML format at /root/start9/config.yaml)
-CONFIG_FILE="/root/start9/config.yaml"
 MEDIAMTX_CONFIG="/data/mediamtx.yml"
 
-# Parse camera URL and stream name from StartOS config
+# Parse camera URL and stream name
 CAMERA_URL=""
 STREAM_NAME="camera1"
 
-if [ -f "$CONFIG_FILE" ]; then
-  # Extract values using grep/sed (simple YAML parsing)
-  CAMERA_URL=$(grep "camera-url:" "$CONFIG_FILE" 2>/dev/null | sed 's/.*camera-url: *//' | tr -d '"' | tr -d "'" || echo "")
-  STREAM_NAME=$(grep "stream-name:" "$CONFIG_FILE" 2>/dev/null | sed 's/.*stream-name: *//' | tr -d '"' | tr -d "'" || echo "camera1")
+# Try StartOS config first
+if [ -f "/root/start9/config.yaml" ]; then
+  CAMERA_URL=$(grep "camera-url:" "/root/start9/config.yaml" 2>/dev/null | sed 's/.*camera-url: *//' | tr -d '"' | tr -d "'" || echo "")
+  STREAM_NAME=$(grep "stream-name:" "/root/start9/config.yaml" 2>/dev/null | sed 's/.*stream-name: *//' | tr -d '"' | tr -d "'" || echo "camera1")
+fi
+
+# Fallback to manual config file
+if [ -z "$CAMERA_URL" ] && [ -f "/data/camera.conf" ]; then
+  . /data/camera.conf
 fi
 
 # Generate MediaMTX config
@@ -35,14 +38,13 @@ paths:
   all:
 EOF
 
-# Add camera path if URL is configured
-if [ -n "$CAMERA_URL" ] && [ "$CAMERA_URL" != "null" ] && [ "$CAMERA_URL" != "~" ]; then
+if [ -n "$CAMERA_URL" ] && [ "$CAMERA_URL" != "null" ]; then
   cat >> "$MEDIAMTX_CONFIG" << EOF
   ${STREAM_NAME}:
     source: "${CAMERA_URL}"
     sourceOnDemand: yes
 EOF
-  echo "Configured stream: $STREAM_NAME"
+  echo "Configured stream: $STREAM_NAME -> $CAMERA_URL"
 else
   echo "No camera URL configured - running in demo mode"
 fi
