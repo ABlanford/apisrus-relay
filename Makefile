@@ -14,9 +14,6 @@ clean:
 verify: $(PACKAGE_ID).s9pk
 	start-sdk verify s9pk $(PACKAGE_ID).s9pk
 
-install: $(PACKAGE_ID).s9pk
-	start-cli package install $(PACKAGE_ID).s9pk
-
 $(PACKAGE_ID).s9pk: manifest.yaml instructions.md icon.png LICENSE.md scripts/embassy.js docker-images/aarch64.tar
 	start-sdk pack
 
@@ -25,4 +22,4 @@ docker-images/aarch64.tar: Dockerfile docker_entrypoint.sh
 	docker buildx build --tag start9/$(PACKAGE_ID)/main:$(PACKAGE_VERSION) --platform=linux/arm64 -o type=docker,dest=docker-images/aarch64.tar .
 
 scripts/embassy.js: $(TS_FILES)
-	deno bundle scripts/embassy.ts scripts/embassy.js
+	deno run --allow-read --allow-write --allow-env --allow-net scripts/bundle.ts
