@@ -1,8 +1,4 @@
-// FeedView Relay - Migration Scripts
-// Handle upgrades between versions
+import { compat, types as T } from "../deps.ts";
 
-import { types as T, compat } from "../deps.ts";
-
-export const migration: T.ExpectedExports.migration = compat.migrations({
-  // No migrations needed for initial version
-});
+export const migration: T.ExpectedExports.migration = compat.migrations
+    .fromMapping({}, "0.3.5.0");
