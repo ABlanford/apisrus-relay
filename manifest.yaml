@@ -1,6 +1,6 @@
 id: feedview-relay
 title: "FeedView Relay"
-version: 0.3.5.2
+version: 0.3.5.3
 release-notes: |
   - Added x86_64 architecture support
   - RTSP to HLS transcoding via MediaMTX
