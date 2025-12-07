@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,19 +27,9 @@ jobs:
           platforms: linux/arm64
           outputs: type=docker,dest=docker-images/aarch64.tar
 
-      - name: Install deps
+      - name: Pack with Start9 SDK Container
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential pkg-config libclang-dev clang libavahi-client-dev libssl-dev
-
-      - name: Install Rust
-        run: curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.65.0 && echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-      - name: Build SDK
-        run: git clone --recursive -b v0.3.3 https://github.com/Start9Labs/start-os.git && cd start-os/backend && cargo install --locked --path . --features sdk
-
-      - name: Pack
-        run: start-sdk init && start-sdk pack
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace ghcr.io/start9labs/start-sdk:v0.3.5.1 sh -c "start-sdk init && start-sdk pack"
 
       - name: Upload
         uses: actions/upload-artifact@v4
