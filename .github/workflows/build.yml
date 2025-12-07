@@ -28,6 +28,10 @@ jobs:
           mkdir -p docker-images
           docker buildx build --tag start9/feedview-relay/main:0.1.0 --platform=linux/arm64 -o type=docker,dest=docker-images/aarch64.tar .
 
+      - name: Load Docker image
+        run: |
+          docker load -i docker-images/aarch64.tar
+
       - name: Install dependencies and build TypeScript
         run: |
           npm install
